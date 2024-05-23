@@ -2,8 +2,6 @@ import pikepdf
 import ArialDict
 import io
 
-import ArialDict37
-
 x = b""
 file_name = '_PE03_2010.pdf'
 
@@ -87,7 +85,7 @@ with (pikepdf.open('latex_1_start.pdf', allow_overwriting_input=True) as pdfl):
                                 if fixable37:
                                     i = 1
                                     for val in font_val.Encoding.Differences:
-                                        uni_from_dict = ArialDict37.arial_dict_37.get(str(val)[1:])
+                                        uni_from_dict = ArialDict.arial_dict.get(str(val)[1:])
                                         toUni_generated += f"<{hex(i)[2:]}> <{uni_from_dict}>\n".encode()
                                         i += 1
 
