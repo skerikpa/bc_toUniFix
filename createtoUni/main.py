@@ -6,9 +6,14 @@ import glob
 
 # Get the current directory (where the script is located)
 current_directory = os.path.dirname(os.path.abspath(__file__))
+input_directory = os.path.join(current_directory, 'input')
+output_directory = os.path.join(current_directory, 'output')
+
+os.makedirs(input_directory, exist_ok=True)
+os.makedirs(output_directory, exist_ok=True)
 
 # Find all .pdf files in the current directory
-pdf_files = glob.glob(os.path.join(current_directory, "*.pdf"))
+pdf_files = glob.glob(os.path.join(input_directory, "*.pdf"))
 
 # Extract just the filenames
 pdf_files = [os.path.basename(pdf) for pdf in pdf_files]
@@ -18,11 +23,12 @@ if "latex_1_start.pdf" in pdf_files:
 
 print(pdf_files)
 
-for pdf in pdf_files:
-    if pdf.endswith("_toUnicode.pdf"):
+for file_name in pdf_files:
+    input_path = os.path.join(input_directory, file_name)
+    output_path = os.path.join(output_directory, file_name[:-4] + '_toUnicode.pdf')
+    if file_name.endswith("_toUnicode.pdf"):
         continue
     x = b""
-    file_name = pdf
 
     with (pikepdf.open('latex_1_start.pdf', allow_overwriting_input=True) as pdfl):
         for page in pdfl.pages:
@@ -35,7 +41,7 @@ for pdf in pdf_files:
                         print(toUni.read_bytes())
                         x = toUni
 
-                        with pikepdf.open(file_name, allow_overwriting_input=True) as pdf:
+                        with pikepdf.open(input_path, allow_overwriting_input=True) as pdf:
                             for page in pdf.pages:
                                 resources = page.Resources
                                 fonts = resources.Font
@@ -73,12 +79,10 @@ for pdf in pdf_files:
                                                                      type_check=True)
                                         #print(font_val.ToUnicode.read_bytes())
 
-
-
-                            pdf.save(file_name[:-4] + '_toUnicode.pdf')
+                            pdf.save(output_path)
                             print(file_name + "fixed")
 
-                        with pikepdf.open(file_name[:-4] + '_toUnicode.pdf', allow_overwriting_input=True) as pdf:
+                        with pikepdf.open(output_path, allow_overwriting_input=True) as pdf:
                             for page in pdf.pages:
                                 resources = page.Resources
                                 fonts = resources.Font
@@ -116,5 +120,5 @@ for pdf in pdf_files:
                                                                      type_check=True)
                                         #print(font_val.ToUnicode.read_bytes())
 
-                            pdf.save(file_name[:-4] + '_toUnicode.pdf')
+                            pdf.save(output_path)
                             print(file_name + "fixed")
