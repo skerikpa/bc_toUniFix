@@ -12,10 +12,10 @@ output_directory = os.path.join(current_directory, 'output')
 os.makedirs(input_directory, exist_ok=True)
 os.makedirs(output_directory, exist_ok=True)
 
-# Find all .pdf files in the current directory
+# Find all .pdf files in the input directory
 pdf_files = glob.glob(os.path.join(input_directory, "*.pdf"))
 
-# Extract just the filenames
+# Extract filenames only
 pdf_files = [os.path.basename(pdf) for pdf in pdf_files]
 
 if "latex_1_start.pdf" in pdf_files:
