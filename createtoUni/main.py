@@ -90,3 +90,4 @@ for file_name in pdf_files:
                                         #print(font_val.ToUnicode.read_bytes())
                                         pdf.save(output_path)
                                         print(file_name + " fixed font " + font_key)
+print("Hotovo.")
