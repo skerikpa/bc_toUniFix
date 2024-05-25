@@ -69,8 +69,11 @@ for file_name in pdf_files:
                     for fixable_font in fixable_fonts:
                         with pikepdf.open(output_path, allow_overwriting_input=True) as pdf:
                             for page in pdf.pages:
-                                resources = page.Resources
-                                fonts = resources.Font
+                                try:
+                                    resources = page.Resources
+                                    fonts = resources.Font
+                                except:
+                                    continue
                                 for font_key, font_val in fonts.items():
 
                                     toUni_generated = b'1 beginbfrange\n<D7> <D8> <03A5>\nendbfrange\n31 beginbfchar\n'
