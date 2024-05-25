@@ -4,8 +4,9 @@ import io
 import os
 import glob
 
-# Get the current directory (where the script is located)
+# Get the current directory
 current_directory = os.path.dirname(os.path.abspath(__file__))
+# Get the input/output directories
 input_directory = os.path.join(current_directory, 'input')
 output_directory = os.path.join(current_directory, 'output')
 
@@ -24,15 +25,19 @@ if "latex_1_start.pdf" in pdf_files:
 print(pdf_files)
 
 for file_name in pdf_files:
+    # path to file
     input_path = os.path.join(input_directory, file_name)
+    # path to output file
     output_path = os.path.join(output_directory, file_name[:-4] + '_toUnicode.pdf')
 
+    # skip already fixed files
     if file_name.endswith("_toUnicode.pdf"):
         continue
 
     x = b""
     fixable_fonts = []
 
+    # get correct ToUnicode
     with (pikepdf.open('latex_1_start.pdf', allow_overwriting_input=True) as pdfl):
         for pageL in pdfl.pages:
             resources = pageL.Resources
@@ -40,9 +45,9 @@ for file_name in pdf_files:
             for font_keyL, font_valL in fonts.items():
                 if font_keyL == '/F21' and font_valL.ToUnicode is not None:
                     toUni = font_valL.ToUnicode
-                    #print(toUni.read_bytes())
                     x = toUni
 
+                    # get fixable fonts into a list
                     with pikepdf.open(input_path, allow_overwriting_input=True) as pdf:
                         for page in pdf.pages:
                             try:
@@ -66,6 +71,7 @@ for file_name in pdf_files:
                                         print("Differences attribute does not exist.")
                         pdf.save(output_path)
 
+                    # fix fonts marked as fixable
                     for fixable_font in fixable_fonts:
                         with pikepdf.open(output_path, allow_overwriting_input=True) as pdf:
                             for page in pdf.pages:
@@ -79,15 +85,19 @@ for file_name in pdf_files:
                                     toUni_generated = b'1 beginbfrange\n<D7> <D8> <03A5>\nendbfrange\n31 beginbfchar\n'
                                     if font_key == fixable_font:
                                         i = 1
+                                        # get glyfs from differences
                                         for val in font_val.Encoding.Differences:
+                                            # unicode from Dict
                                             uni_from_dict = ArialDict.arial_dict.get(str(val)[1:])
-                                            toUni_generated += f"<{hex(i)[2:]}> <{uni_from_dict}>\n".encode()
+                                            if i < 16:
+                                                toUni_generated += f"<0{hex(i)[2:].upper()}> <{uni_from_dict}>\n".encode()
+                                            else:
+                                                toUni_generated += f"<{hex(i)[2:].upper()}> <{uni_from_dict}>\n".encode()
                                             i += 1
                                         a = pdf.copy_foreign(x)
                                         font_val.ToUnicode = a
                                         font_val.ToUnicode.write(toUni_generated, filter=None, decode_parms=None,
                                                                      type_check=True)
-                                        #print(font_val.ToUnicode.read_bytes())
                                         pdf.save(output_path)
                                         print(file_name + " fixed font " + font_key)
 print("Hotovo.")
