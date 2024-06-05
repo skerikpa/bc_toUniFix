@@ -69,6 +69,8 @@ for file_name in pdf_files:
                                                 fixable_fonts.append(font_key)
                                     except AttributeError:
                                         print("Differences attribute does not exist.")
+                                    except ValueError:
+                                        print("Differences attribute does not exist.")
                         pdf.save(output_path)
 
                     # fix fonts marked as fixable
